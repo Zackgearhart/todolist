@@ -236,7 +236,7 @@ $(function() {
 				removeAddPost();
 				reloadPosts();
 				// getPosts();
-				ajaxDone = true;
+				ajaxDone = true;	
 				if (data.length < limit) {
 					morePages = false;
 				}
