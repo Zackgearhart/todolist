@@ -12,6 +12,13 @@ header{
     background-color: #4C468C;
     z-index: 1;
 }
+.datelocation{
+	display: inline-block;
+	white-space: nowrap;
+  	overflow: hidden;
+ 	text-overflow: ellipsis;
+ 	max-width: 12ch;
+}
 main{
 	width:75%;
 	background-color: #1778f2;

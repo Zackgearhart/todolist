@@ -1,6 +1,6 @@
 $(function() {
 	var offset = 0;
-	var limit = 6;
+	var limit = 7;
 	var ajaxDone = true;
 	var morePages = true;
 	var editId = 0;
@@ -114,14 +114,19 @@ $(function() {
 	function resetPost() {
 		editId = 0;
 		$("#create-post-popup textarea").val("");
+		$("#datepicker").val("");
+
 	}
 
 	function showEditPost() {
 		console.log($(this).data("id"));
 		$("#delete-post-button").show();
 		var text = $(this).parent().parent().find(".post-content").text();
+		var date = $(this).parent().parent().find(".datelocation").text();
 		console.log(text);
+		console.log(date);
 		$("#create-post-popup textarea").val(text);
+		$("#datepicker").val(date);
 		$("#create-post-popup").addClass("show-add-popup");
 		$("main").addClass("main-add-popup");
 		var id = $(this).data("id");
@@ -214,6 +219,7 @@ $(function() {
 	function savePosts() {
 		var content = $("#create-post-popup textarea").val();
 		var date = $("#datepicker").val();
+		ajaxDone = false;
 		console.log(date);
 		$.ajax({
 			url: "/save-post",
@@ -222,7 +228,7 @@ $(function() {
 			data: {
 				content: content,
 				id: editId,
-				date:date
+				date: date
 			},
 			error: ajaxError,
 			success: function(data) {
@@ -230,6 +236,17 @@ $(function() {
 				removeAddPost();
 				reloadPosts();
 				// getPosts();
+				ajaxDone = true;
+				if (data.length < limit) {
+					morePages = false;
+				}
+				morePages = true;
+				offset = 0;
+				$(".post").remove();
+				console.log(ajaxDone + " ajaxdone " + "limit = " + limit + " data.length = " + data.length);
+				if (data.length < limit) {
+					morePages = false;
+				}
 			}
 		});
 	}
@@ -276,6 +293,7 @@ $(function() {
 			$post.removeAttr("id");
 			$post.addClass("post");
 			$post.find(".username").append(data[i].user.name);
+			$post.find(".datelocation").append(data[i].date);
 			$post.find(".post-content").append(data[i].content);
 
 			if (!data[i].editable) {

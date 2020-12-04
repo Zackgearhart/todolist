@@ -131,7 +131,7 @@ public class PostController {
 			Post post = PostRepo.findById(id).get();
 			if (user.getName().equals(post.getUser().getName())) {
 				post.setContent(content);
-				post.setDate(new Date());
+				post.setDate(date);
 				post = PostRepo.save(post);
 				return post;
 			}
