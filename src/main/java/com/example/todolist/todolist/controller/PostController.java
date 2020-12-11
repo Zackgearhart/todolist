@@ -54,13 +54,22 @@ public class PostController {
 		String name = auth.getName();
 		User user = UserRepo.findFirstByName(name);
 		Pageable page = PageRequest.of(offset/limit, limit);
+		List<Integer> commentPostIds = CommentRepo.getCommentPostIds();
 		
 		List<Post> posts = (List<Post>) PostRepo.findAllByOrderByDateAsc(page);
 
 		for (Post post : posts) {
+			int commentCount=0;
 			if (name.equals(post.getUser().getName())) {
 				post.setEditable(true);
 			}
+			for (int commentPostId: commentPostIds) {
+				if (commentPostId == post.getId()) {
+					commentCount += 1;
+				}
+				post.setCommentCount(commentCount);
+			}
+			
 
 		}
 		return posts;

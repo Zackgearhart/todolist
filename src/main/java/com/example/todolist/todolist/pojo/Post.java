@@ -7,13 +7,13 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.SecondaryTable;
+//import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
 @Table(name="posts")
-@SecondaryTable(name="post_comments")
+//@SecondaryTable(name="post_comments")
 public class Post {
     @Id
     @Column(name="posts_id")
@@ -29,8 +29,11 @@ public class Post {
     @Column(name="posts_date")
     private Date date;
     
-    @Column(name="comment_count", table="post_comments", insertable=false, updatable=false)
-    private Integer commentCount;
+//    @Column(name="comment_count", table="post_comments", insertable=false, updatable=false)
+//    private Integer commentCount;
+
+    @Transient
+    private int commentCount;
     
     @Transient
     private boolean editable;
@@ -82,4 +85,8 @@ public class Post {
     public void setCommentCount(Integer commentCount) {
         this.commentCount = commentCount;
     }
+
+	public void setCommentCount(int commentCount) {
+		this.commentCount = commentCount;
+	}
 }

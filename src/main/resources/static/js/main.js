@@ -5,7 +5,10 @@ $(function() {
 	var morePages = true;
 	var editId = 0;
 	var commentPostId = 0;
+	var uploads = [];
+	Dropzone.autoDiscover = false;
 
+	initUpload();
 
 	$(window).scroll(scrolled);
 	$("#add-post").click(showAddPost);
@@ -24,6 +27,23 @@ $(function() {
 
 	getPosts();
 
+	function initUpload() {
+		var dzDiv = $("#upload");
+		dzDiv.addClass("dropzone");
+		var dz = new Dropzone("#upload", {
+			paramName: "files",
+			url: "/upload"
+		});
+		dz.on("success", uploadComplete);
+		dz.on("error", function(file, msg) {
+			alert(msg);
+		});
+	}
+
+	function uploadComplete(event, response) {
+		console.log(response);
+		uploads.push(response);
+	}
 
 
 	function scrolled() {
@@ -115,6 +135,9 @@ $(function() {
 		editId = 0;
 		$("#create-post-popup textarea").val("");
 		$("#datepicker").val("");
+		$("#upload").removeClass();
+		$("#upload").addClass("dropzone dz-clickable");
+		$(".dz-preview").remove();
 
 	}
 
@@ -204,7 +227,21 @@ $(function() {
 			},
 			error: ajaxError,
 			success: function() {
+				resetPost();
+				removeAddPost();
 				reloadPosts();
+				ajaxDone = true;
+				if (data.length < limit) {
+					morePages = false;
+				}
+				morePages = true;
+				offset = 0;
+				$(".post").remove();
+				buildPosts(data);
+				console.log(ajaxDone + " ajaxdone " + "limit = " + limit + " data.length = " + data.length);
+				if (data.length < limit) {
+					morePages = false;
+				}
 				//getPosts();
 			}
 		});
@@ -217,18 +254,28 @@ $(function() {
 	}
 
 	function savePosts() {
-		var content = $("#create-post-popup textarea").val();
-		var date = $("#datepicker").val();
+		var $div = $("<div/>");
+		var $images = $("<p/>");
+		for (var i = 0; i < uploads.length; i++) {
+			var $a = $("<a/>")
+			$a.attr("href", uploads[i].file);
+			$img = $("<img/>");
+			$img.attr("src", uploads[i].thumbnail);
+			$a.append($img);
+			$images.append($a);
+		}
+		$div.append($images);
+		uploads = [];
 		ajaxDone = false;
-		console.log(date);
+		console.log($("#datepicker").val());
 		$.ajax({
 			url: "/save-post",
 			method: "post",
 			type: "json",
 			data: {
-				content: content,
+				content: $("#create-post-popup textarea").val() + $div.html(),
 				id: editId,
-				date: date
+				date: $("#datepicker").val(),
 			},
 			error: ajaxError,
 			success: function(data) {
@@ -236,14 +283,13 @@ $(function() {
 				removeAddPost();
 				reloadPosts();
 				// getPosts();
-				ajaxDone = true;	
+				ajaxDone = true;
 				if (data.length < limit) {
 					morePages = false;
 				}
 				morePages = true;
 				offset = 0;
 				$(".post").remove();
-				console.log(ajaxDone + " ajaxdone " + "limit = " + limit + " data.length = " + data.length);
 				if (data.length < limit) {
 					morePages = false;
 				}

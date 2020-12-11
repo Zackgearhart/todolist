@@ -91,3 +91,7 @@ main{
 .comment-count:hover, .comment-count-shown:hover{
 	cursor:pointer;
 }
+.post-content img{
+	height:50%;
+	width:50%;
+}

@@ -1,6 +1,7 @@
 package com.example.todolist.todolist.repo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -17,5 +18,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
 	public List<Post> findAllByContentContainingOrderByDateAsc(String text, Pageable page);
 
 	public List<Post> findAllByOrderByDateAsc(Pageable page);
+	
+    public Optional<Post> findById(Integer id);
 
 }
