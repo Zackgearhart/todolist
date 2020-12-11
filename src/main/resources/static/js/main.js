@@ -226,7 +226,7 @@ $(function() {
 				id: editId
 			},
 			error: ajaxError,
-			success: function() {
+			success: function(data) {
 				resetPost();
 				removeAddPost();
 				reloadPosts();
