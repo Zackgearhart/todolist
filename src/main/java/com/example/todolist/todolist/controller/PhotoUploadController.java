@@ -60,7 +60,7 @@ public class PhotoUploadController {
 			FileOutputStream outStream = new FileOutputStream(f);
 			pipeStream(file.getInputStream(), outStream);
 			outStream.close();
-			if (file.getOriginalFilename().toLowerCase().endsWith(".jpg")) {
+			if ((file.getOriginalFilename().toLowerCase().endsWith(".jpg")) || (file.getOriginalFilename().toLowerCase().endsWith(".png"))) {
 				processPhoto(uploadingDir, file.getOriginalFilename(), f);
 			}
 			name = "/media/"+file.getOriginalFilename();
@@ -83,6 +83,8 @@ public class PhotoUploadController {
 	private void processPhoto(String dir, String file, File f) throws Exception {
 		scaleImage(f, new File(dir, file), 1080, "jpg");
 		scaleImage(f, new File(dir, "th-"+file), 300, "jpg");
+		scaleImage(f, new File(dir, file), 1080, "png");
+		scaleImage(f, new File(dir, "th-"+file), 300, "png");
 	}
 
 	private void scaleImage(File inputFile, File outputFile, int photoHeight, String ext) throws Exception {
