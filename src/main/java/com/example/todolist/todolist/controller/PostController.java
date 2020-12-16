@@ -33,20 +33,31 @@ public class PostController {
 	}
 	
 	@RequestMapping("/search-posts")
-	public List<Post> searchPost(@RequestParam String text, @RequestParam int limit, @RequestParam int offset){
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String name = auth.getName();
-		Pageable page = PageRequest.of(offset/limit, limit);
-		
-		List <Post> posts = (List<Post>) PostRepo.findAllByContentContainingOrderByDateAsc(text, page);
-		
-		for(Post post: posts) {
-			if(name.equals(post.getUser().getName())) {
-				post.setEditable(true);
+    public List<Post> searchPosts(
+            @RequestParam String text,
+            @RequestParam int limit,
+            @RequestParam int offset) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String name = auth.getName();
+        Pageable page = PageRequest.of(offset/limit, limit);
+        List<Integer> commentPostIds = CommentRepo.getCommentPostIds();
+        
+        List<Post> posts = (List<Post>) PostRepo.findAllByContentContainingIgnoreCaseOrderByDateAsc(text, page);
+        
+        for (Post post:posts) {
+        	int commentCount=0;
+            if (name.equals(post.getUser().getName())) {
+                post.setEditable(true);
+            }
+			for (int commentPostId: commentPostIds) {
+				if (commentPostId == post.getId()) {
+					commentCount += 1;
+				}
+				post.setCommentCount(commentCount);
 			}
-		}
-		return posts;
-	}
+        }
+        return posts;
+    }
 
 	@RequestMapping("/get-posts")
 	public List<Post> getPosts(@RequestParam int limit, @RequestParam int offset) {
@@ -166,6 +177,19 @@ public class PostController {
 			PostRepo.delete(post);
 		}
 		return post;
+	}
+	
+	@RequestMapping("/delete-comment")
+	public Comment deleteComment(@RequestParam int id) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String name = auth.getName();
+		User user = UserRepo.findFirstByName(name);
+		Comment comment = CommentRepo.findById(id).get();
+
+		if (user.getName().equals(comment.getUser().getName())) {
+			CommentRepo.delete(comment);
+		}
+		return comment;
 	}
 
 }

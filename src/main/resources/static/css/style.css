@@ -61,7 +61,7 @@ main{
 .editable:hover{
 	cursor:pointer;
 }
-.show-add-popup{
+.show-add-popup, #show-comment-popup{
 	margin-top:0;
 	display:block !important;
 }

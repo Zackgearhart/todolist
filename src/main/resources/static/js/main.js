@@ -17,13 +17,15 @@ $(function() {
 	$("#delete-post-button").click(deletePost);
 	$("#cancel-comment").click(closeAddComment);
 	$("#save-comment").click(saveComment);
-	$("#search").keypress(searchKey);
-	/*$("#search").bind("search", searchKey,  )*/
+	/*$("#search").keypress(searchKey);*/
+	$("#search").bind("search", searchKey);
 	$("main").on("click", ".comment-icon", showAddComment);
 	$("main").on("click", ".editable", showEditPost);
 	$("main").on("click", ".comment-count", getComments);
 	$("main").on("click", ".comment-count-shown", removecomments);
 	$("#datepicker").datepicker();
+	$("main").on("click", ".editable2", showEditComment);
+	$("main").on("click", "#delete-comment", deleteComment);
 
 	getPosts();
 
@@ -63,14 +65,12 @@ $(function() {
 	function searchKey() {
 		ajaxDone = false;
 		offset = 0;
-		var text = $("#search").val();
-		if (event.which == 13) {
 			$.ajax({
 				url: "/search-posts",
 				method: "GET",
 				dataType: "json",
 				data: {
-					text: text,
+					text: $("#search").val(),
 					limit: limit,
 					offset: offset,
 				},
@@ -93,18 +93,8 @@ $(function() {
 					}
 				}
 			});
-		}
 	}
 
-	function showAddComment() {
-		editId = 0;
-		commentPostId = $(this).parent().parent().find(".editable").data("id");
-		console.log(commentPostId);
-		$("#add-comment-popup textarea").val("");
-		var $popup = $("#add-comment-popup").detach();
-		$(this).parent().parent().after($popup);
-		$popup.show();
-	}
 
 	function closeAddComment() {
 		$(this).parent().hide();
@@ -155,6 +145,30 @@ $(function() {
 		var id = $(this).data("id");
 		editId = id;
 	}
+	
+	function showAddComment() {
+		editId = 0;
+		commentPostId = $(this).parent().parent().find(".editable").data("id");
+		console.log(commentPostId);
+		$("#add-comment-popup textarea").val("");
+		var $popup = $("#add-comment-popup").detach();
+		$(this).parent().parent().after($popup);
+		$popup.show();
+	}
+	
+		function showEditComment() {
+		id = $(this).parent().find(".editable2").data("id");
+		var text = $(this).parent().parent().find(".comment-content").text();
+		var postId = $(this).parent().parent().parent().find(".editable").data("id");
+		console.log(text);
+		console.log(postId);
+		editId = id;
+		console.log(editId);
+		$("#add-comment-popup textarea").val(text);
+		var $editpopup = $("#add-comment-popup").detach();
+		$(this).parent().parent().after($editpopup);
+		$editpopup.show();
+	}
 
 
 	function getComments() {
@@ -184,7 +198,7 @@ $(function() {
 						$comment.find(".editable2").hide();
 					}
 
-					$comment.find(".editable").data("id", data[i].id);
+					$comment.find(".editable2").data("id", data[i].id);
 					$(commentLocation).append($comment);
 				}
 
@@ -208,10 +222,8 @@ $(function() {
 				postId: commentPostId
 			},
 			error: ajaxError,
-			success: function(data) {
-				console.log(data);
-				$("#add-comment-popup").hide();
-				reloadPosts();
+			success: function() {
+				location.reload();
 			}
 		});
 	}
@@ -226,7 +238,7 @@ $(function() {
 				id: editId
 			},
 			error: ajaxError,
-			success: function(data	) {
+			success: function(data) {
 				resetPost();
 				removeAddPost();
 				reloadPosts();
@@ -243,6 +255,21 @@ $(function() {
 					morePages = false;
 				}
 				//getPosts();
+			}
+		});
+	}
+	
+	function deleteComment() {
+		$.ajax({
+			url: "/delete-comment",
+			method: "get",
+			type: "json",
+			data: {
+				id: editId
+			},
+			error: ajaxError,
+			success: function() {
+				location.reload();
 			}
 		});
 	}
@@ -339,7 +366,9 @@ $(function() {
 			$post.removeAttr("id");
 			$post.addClass("post");
 			$post.find(".username").append(data[i].user.name);
-			$post.find(".datelocation").append(data[i].date);
+			var date = data[i].date;
+			var dateFixed = date.substring(0, 10);
+			$post.find(".datelocation").append(dateFixed);
 			$post.find(".post-content").append(data[i].content);
 
 			if (!data[i].editable) {

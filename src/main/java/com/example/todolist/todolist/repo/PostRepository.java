@@ -15,7 +15,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
 
 	public List<Post> findAllByOrderByDateDesc(Pageable page);
 
-	public List<Post> findAllByContentContainingOrderByDateAsc(String text, Pageable page);
+	public List<Post> findAllByContentContainingIgnoreCaseOrderByDateAsc(String text, Pageable page);
 
 	public List<Post> findAllByOrderByDateAsc(Pageable page);
 	
