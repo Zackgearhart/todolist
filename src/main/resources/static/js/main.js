@@ -61,40 +61,38 @@ $(function() {
 
 	}
 
-
 	function searchKey() {
 		ajaxDone = false;
 		offset = 0;
-			$.ajax({
-				url: "/search-posts",
-				method: "GET",
-				dataType: "json",
-				data: {
-					text: $("#search").val(),
-					limit: limit,
-					offset: offset,
-				},
-				error: function() {
-					ajaxDone = true;
-					ajaxError();
-				},
-				success: function(data) {
-					ajaxDone = true;
-					if (data.length < limit) {
-						morePages = false;
-					}
-					morePages = true;
-					offset = 0;
-					$(".post").remove();
-					buildPosts(data);
-					console.log(ajaxDone + " ajaxdone " + "limit = " + limit + " data.length = " + data.length);
-					if (data.length < limit) {
-						morePages = false;
-					}
+		$.ajax({
+			url: "/search-posts",
+			method: "GET",
+			dataType: "json",
+			data: {
+				text: $("#search").val(),
+				limit: limit,
+				offset: offset,
+			},
+			error: function() {
+				ajaxDone = true;
+				ajaxError();
+			},
+			success: function(data) {
+				ajaxDone = true;
+				if (data.length < limit) {
+					morePages = false;
 				}
-			});
+				morePages = true;
+				offset = 0;
+				$(".post").remove();
+				buildPosts(data);
+				console.log(ajaxDone + " ajaxdone " + "limit = " + limit + " data.length = " + data.length);
+				if (data.length < limit) {
+					morePages = false;
+				}
+			}
+		});
 	}
-
 
 	function closeAddComment() {
 		$(this).parent().hide();
@@ -145,7 +143,7 @@ $(function() {
 		var id = $(this).data("id");
 		editId = id;
 	}
-	
+
 	function showAddComment() {
 		editId = 0;
 		commentPostId = $(this).parent().parent().find(".editable").data("id");
@@ -155,8 +153,8 @@ $(function() {
 		$(this).parent().parent().after($popup);
 		$popup.show();
 	}
-	
-		function showEditComment() {
+
+	function showEditComment() {
 		id = $(this).parent().find(".editable2").data("id");
 		var text = $(this).parent().parent().find(".comment-content").text();
 		var postId = $(this).parent().parent().parent().find(".editable").data("id");
@@ -258,7 +256,7 @@ $(function() {
 			}
 		});
 	}
-	
+
 	function deleteComment() {
 		$.ajax({
 			url: "/delete-comment",
